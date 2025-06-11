@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jonchki-artifact version="1.0">
+	<info group="se"
+	      module="nettle"
+	      artifact="libnettle"
+	      version="@PROJECT_VERSION@"
+	      vcs-id="@PROJECT_VERSION_VCS@"
+	      extension="tar.xz"
+	      platform="@JONCHKI_PLATFORM@">
+		<license name="GPLv3"/>
+		<author name="Niels Möller" url="https://www.lysator.liu.se/~nisse/nettle/" />
+		<description>
+			This module contains libnettle @PROJECT_VERSION@ in form of a static library and the development files.
+		</description>
+	</info>
+	<dependencies/>
+</jonchki-artifact>
