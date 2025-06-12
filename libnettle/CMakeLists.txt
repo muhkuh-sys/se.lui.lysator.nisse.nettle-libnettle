@@ -4,13 +4,26 @@ PROJECT("libnettle")
 
 INCLUDE(ExternalProject)
 SET(VERSION_EXTERNAL "3.9")
+SET(VERSION_PACKAGE  "1")
+SET(PROJECT_VERSION  "${VERSION_EXTERNAL}.${VERSION_PACKAGE}")
 SET(PYTHON_EXECUTABLE "${Python3_EXECUTABLE}")
+SET(LIBGMP_INCLUDE_DIR "${CMAKE_BINARY_DIR}/build_requirements/jonchki/install/dev/include")
+SET(LIBGMP_LIB_DIR "${CMAKE_BINARY_DIR}/build_requirements/jonchki/install/dev/lib")
+message("******${LIBGMP_INCLUDE_DIR}")
+message("******${LIBGMP_LIB_DIR}")
+# Get the VCS version for the jonchki configuration.
+INCLUDE(${CMAKE_HOME_DIRECTORY}/cmake/version.cmake)
 
+# Filter the jonchki configuration.
+CONFIGURE_FILE(installer/libnettle.xml
+               ${CMAKE_BINARY_DIR}/libnettle-${PROJECT_VERSION}.xml
+               @ONLY)
 
 #----------------------------------------------------------------------------
 #
 # Build the project.
 #
+IF((${BUILDCFG_ONLY_JONCHKI_CFG} STREQUAL "OFF"))
 ExternalProject_Add(TARGET_libnettle
                     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/libnettle
                     URL ${CMAKE_CURRENT_SOURCE_DIR}/nettle-3.9.tar.gz
@@ -21,7 +34,7 @@ ExternalProject_Add(TARGET_libnettle
 )
 
 # libnettle depends on libGMP.
-ADD_DEPENDENCIES(TARGET_libnettle TARGET_libgmp)
+#ADD_DEPENDENCIES(TARGET_libnettle TARGET_libgmp)
 
 SET(LIBNETTLE_PREFIX       ${CMAKE_BINARY_DIR}/install            CACHE INTERNAL "The complete path to the libnettle installation.")
 SET(LIBNETTLE_LIBRARY      nettle                                 CACHE INTERNAL "The complete path to the libnettle library.")
@@ -29,20 +42,16 @@ SET(LIBHOGWEED_LIBRARY     hogweed                                CACHE INTERNAL
 SET(LIBNETTLE_INCLUDE_DIR  ${LIBNETTLE_PREFIX}/include            CACHE INTERNAL "The include folder for the libnettle library.")
 
 # Use the lib64 folder only on "ubuntu 20.04 x86_64" and "ubuntu 22.04 x86_64".
-SET(HAS_LIB64 (
-        (JONCHKI_PLATFORM_DIST_ID STREQUAL "ubuntu") AND
-        (
-                (JONCHKI_PLATFORM_DIST_VERSION STREQUAL "20.04") OR
-                (JONCHKI_PLATFORM_DIST_VERSION STREQUAL "22.04")
-        ) AND
-        (JONCHKI_PLATFORM_CPU_ARCH STREQUAL "x86_64")
-))
+IF(JONCHKI_PLATFORM_CPU_ARCH STREQUAL "x86_64")
+        SET(LIB_FOLDER "lib64")
+ELSE(JONCHKI_PLATFORM_CPU_ARCH STREQUAL "x86_64")
+        SET(LIB_FOLDER "lib")
+ENDIF(JONCHKI_PLATFORM_CPU_ARCH STREQUAL "x86_64")
 
-IF(${HAS_LIB64})
-	SET(LIBNETTLE_LIB_DIR      ${LIBNETTLE_PREFIX}/lib64      CACHE INTERNAL "The complete path to the libnettle library.")
-ELSE(${HAS_LIB64})
-	SET(LIBNETTLE_LIB_DIR      ${LIBNETTLE_PREFIX}/lib        CACHE INTERNAL "The complete path to the libnettle library.")
-ENDIF(${HAS_LIB64})
+
+
+SET(LIBNETTLE_LIB_DIR      ${LIBNETTLE_PREFIX}/${LIB_FOLDER}   CACHE INTERNAL "The complete path to the libnettle library.")
+
 
 
 # Create a package.
@@ -50,7 +59,7 @@ SET(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_BINARY_DIR}/../repository/org/libnettle/${V
 SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY FALSE)
 SET(CPACK_GENERATOR "TXZ")
 
-INSTALL(FILES ${CMAKE_BINARY_DIR}/install/lib/libnettle.a
+INSTALL(FILES ${CMAKE_BINARY_DIR}/install/${LIB_FOLDER}/libnettle.a ${CMAKE_BINARY_DIR}/install/${LIB_FOLDER}/libhogweed.a
 		TYPE LIB)
 INSTALL(DIRECTORY ${CMAKE_BINARY_DIR}/install/include/
 		DESTINATION include)
@@ -69,3 +78,5 @@ CONFIGURE_FILE(installer/libnettle.xml
 SET(CPACK_PACKAGE_FILE_NAME "libnettle-${VERSION_EXTERNAL}-${JONCHKI_PLATFORM}")
 
 INCLUDE(CPack)
+
+ENDIF((${BUILDCFG_ONLY_JONCHKI_CFG} STREQUAL "OFF"))

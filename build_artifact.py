@@ -29,6 +29,41 @@ strCfg_workingFolder = os.path.join(
     tPlatform['platform_id']
 )
 
+# Where is the jonchkihere tool?
+strCfg_jonchkiHerePath = os.path.join(
+    strCfg_projectFolder,
+    'jonchki'
+)
+# This is the Jonchki version to use.
+strCfg_jonchkiVersion = '0.0.12.1'
+# Look in this folder for Jonchki archives before downloading them.
+strCfg_jonchkiLocalArchives = os.path.join(
+    strCfg_projectFolder,
+    'jonchki',
+    'local_archives'
+)
+# The target folder for the jonchki installation. A subfolder named
+# "jonchki-VERSION" will be created there. "VERSION" will be replaced with
+# the version number from strCfg_jonchkiVersion.
+strCfg_jonchkiInstallationFolder = os.path.join(
+    strCfg_projectFolder,
+    'build'
+)
+
+# Select the verbose level for jonchki.
+# Possible values are "debug", "info", "warning", "error" and "fatal".
+strCfg_jonchkiVerbose = 'debug'
+
+strCfg_jonchkiSystemConfiguration = os.path.join(
+    strCfg_projectFolder,
+    'jonchki',
+    'jonchkisys.cfg'
+)
+strCfg_jonchkiProjectConfiguration = os.path.join(
+    strCfg_projectFolder,
+    'jonchki',
+    'jonchkicfg.xml'
+)
 # -
 # --------------------------------------------------------------------------
 
@@ -73,12 +108,68 @@ else:
 
 # Create the folders if they do not exist yet.
 astrFolders = [
-    strCfg_workingFolder
+    strCfg_workingFolder,
+    os.path.join(strCfg_workingFolder, 'build_requirements')
 ]
 for strPath in astrFolders:
     if os.path.exists(strPath) is not True:
         os.makedirs(strPath)
 
+# Install jonchki.
+strJonchki = jonchkihere.install(
+    strCfg_jonchkiVersion,
+    strCfg_jonchkiInstallationFolder,
+    LOCAL_ARCHIVES=strCfg_jonchkiLocalArchives
+)
+# ---------------------------------------------------------------------------
+#
+# Get the build requirements.
+#
+strCwd = os.path.join(strCfg_workingFolder, 'build_requirements')
+for strMatch in glob.iglob(os.path.join(strCwd, 'curl-*.xml')):
+    os.remove(strMatch)
+
+astrCmd = [
+    'cmake',
+    '-DCMAKE_INSTALL_PREFIX=""',
+    '-DPRJ_DIR=%s' % strCfg_projectFolder,
+    '-DBUILDCFG_ONLY_JONCHKI_CFG="ON"'
+]
+astrCmd.extend(astrCMAKE_COMPILER)
+astrCmd.extend(astrCMAKE_PLATFORM)
+astrCmd.append(strCfg_projectFolder)
+subprocess.check_call(' '.join(astrCmd), shell=True, cwd=strCwd, env=astrEnv)
+subprocess.check_call(strMake, shell=True, cwd=strCwd, env=astrEnv)
+
+astrMatch = glob.glob(os.path.join(strCwd, 'libnettle-*.xml'))
+if len(astrMatch) != 1:
+    raise Exception('No match found for "libnettle-*.xml".')
+
+astrCmd = [
+    strJonchki,
+    'install-dependencies',
+    '--verbose', strCfg_jonchkiVerbose,
+    '--syscfg', strCfg_jonchkiSystemConfiguration,
+    '--prjcfg', strCfg_jonchkiProjectConfiguration,
+
+    '--logfile', os.path.join(
+        strCfg_workingFolder,
+        'build_requirements',
+        'jonchki.log'
+    ),
+
+    '--dependency-log', os.path.join(
+        strCfg_projectFolder,
+        'dependency-log.xml'
+    )
+]
+astrCmd.extend(astrJONCHKI_SYSTEM)
+astrCmd.append('--build-dependencies')
+astrCmd.append(astrMatch[0])
+subprocess.check_call(' '.join(astrCmd), shell=True, cwd=strCwd, env=astrEnv)
+
+#astrCMAKE_COMPILER.append('-DZLIB_PREFIX=%s' % os.path.join(strCfg_workingFolder, 'build_requirements', 'jonchki', 'install', 'dev'))
+#astrCMAKE_COMPILER.append('-Dnet.zlib-zlib_DIR=%s' % os.path.join(strCfg_workingFolder, 'build_requirements', 'jonchki', 'install', 'dev', 'cmake'))
 
 # ---------------------------------------------------------------------------
 #

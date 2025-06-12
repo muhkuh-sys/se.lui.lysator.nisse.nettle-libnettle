@@ -13,5 +13,15 @@
 			This module contains libnettle @PROJECT_VERSION@ in form of a static library and the development files.
 		</description>
 	</info>
-	<dependencies/>
+	<dependencies>
+		<build-dependency group="org"
+	      module="gmplib"
+	      artifact="gmp" 
+		  version="6"/>
+	</dependencies>
+	<actions>
+	<action name="pack">
+                  return true
+	</action>
+</actions>
 </jonchki-artifact>
