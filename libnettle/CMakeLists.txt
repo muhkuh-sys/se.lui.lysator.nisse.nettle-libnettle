@@ -60,20 +60,20 @@ SET(CPACK_INCLUDE_TOPLEVEL_DIRECTORY FALSE)
 SET(CPACK_GENERATOR "TXZ")
 
 INSTALL(FILES ${CMAKE_BINARY_DIR}/install/${LIB_FOLDER}/libnettle.a ${CMAKE_BINARY_DIR}/install/${LIB_FOLDER}/libhogweed.a
-		TYPE LIB)
+        TYPE LIB)
 INSTALL(DIRECTORY ${CMAKE_BINARY_DIR}/install/include/
-		DESTINATION include)
+        DESTINATION include)
 
 CONFIGURE_FILE(installer/install.lua 
-				${CMAKE_CURRENT_BINARY_DIR}/package/install.lua
-				@ONLY)
+               ${CMAKE_CURRENT_BINARY_DIR}/package/install.lua
+               @ONLY)
 
 INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/package/install.lua
-		DESTINATION .)
+         DESTINATION .)
 
 CONFIGURE_FILE(installer/libnettle.xml
-				${CPACK_OUTPUT_FILE_PREFIX}/libnettle-${VERSION_EXTERNAL}-${JONCHKI_PLATFORM}.xml
-				@ONLY)
+               ${CPACK_OUTPUT_FILE_PREFIX}/libnettle-${PROJECT_VERSION}-${JONCHKI_PLATFORM}.xml
+               @ONLY)
 
 SET(CPACK_PACKAGE_FILE_NAME "libnettle-${VERSION_EXTERNAL}-${JONCHKI_PLATFORM}")
 
