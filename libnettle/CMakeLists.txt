@@ -79,4 +79,16 @@ SET(CPACK_PACKAGE_FILE_NAME "libnettle-${VERSION_EXTERNAL}-${JONCHKI_PLATFORM}")
 
 INCLUDE(CPack)
 
+#-----------------------------------------------------------------------------
+#
+# Create a custom target named "pack".
+# It builds the package and creates the hashes.
+#
+ADD_CUSTOM_TARGET(pack
+                  COMMAND ${CMAKE_MAKE_PROGRAM}
+                  COMMAND ${CMAKE_MAKE_PROGRAM} package
+                  COMMAND "${PYTHON_EXECUTABLE}" ${CMAKE_HOME_DIRECTORY}/cmake/tools/generate_hash.py ${CPACK_OUTPUT_FILE_PREFIX}/libnettle-${PROJECT_VERSION}-${JONCHKI_PLATFORM}.xml
+                  COMMAND "${PYTHON_EXECUTABLE}" ${CMAKE_HOME_DIRECTORY}/cmake/tools/generate_hash.py ${CPACK_OUTPUT_FILE_PREFIX}/libnettle-${PROJECT_VERSION}-${JONCHKI_PLATFORM}.tar.xz
+                  COMMENT "Pack the artifact and generate the hashes...")
+
 ENDIF((${BUILDCFG_ONLY_JONCHKI_CFG} STREQUAL "OFF"))

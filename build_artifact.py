@@ -187,7 +187,7 @@ subprocess.check_call(' '.join(astrCmd), shell=True, cwd=strCfg_workingFolder, e
 
 astrCmd = [
     strMake,
-    'package'
+    'pack'
 ]
 subprocess.check_call(' '.join(astrCmd), shell=True, cwd=strCfg_workingFolder, env=astrEnv)
 # ---------------------------------------------------------------------------
