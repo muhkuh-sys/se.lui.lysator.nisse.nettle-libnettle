@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jonchki-artifact version="1.0">
-	<info group="se"
+	<info group="se.lui.lysator.nisse"
 	      module="nettle"
 	      artifact="libnettle"
 	      version="@PROJECT_VERSION@"

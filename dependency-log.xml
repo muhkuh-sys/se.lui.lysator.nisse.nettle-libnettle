@@ -2,7 +2,7 @@
 <dependency-log>
 	<dependencies>
 		<dependency group="org" module="gmplib" artifact="gmp" version="6.2.1.1"/>
-		<dependency group="se" module="nettle" artifact="libnettle" version="3.9.1"/>
+		<dependency group="se.lui.lysator.nisse" module="nettle" artifact="libnettle" version="3.9.1"/>
 	</dependencies>
 	<build-dependencies>
 	</build-dependencies>
