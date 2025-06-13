@@ -31,6 +31,8 @@ ExternalProject_Add(TARGET_libnettle
                     CONFIGURE_COMMAND ${CMAKE_COMMAND} -E env "LIBS=-lgmp" ${CMAKE_CURRENT_BINARY_DIR}/libnettle/src/TARGET_libnettle/configure --prefix=${CMAKE_BINARY_DIR}/install --enable-static=yes --enable-shared=no --enable-pic --with-include-path=${LIBGMP_INCLUDE_DIR} --with-lib-path=${LIBGMP_LIB_DIR} --host=${CONFIGURE_HOST}
                     BUILD_COMMAND make
                     INSTALL_COMMAND make install
+                    TEST_COMMAND ${CMAKE_SOURCE_DIR}/cmake/tools/fix_pkgconfig.sh ${CMAKE_BINARY_DIR}/install
+                    TEST_AFTER_INSTALL 1
 )
 
 # libnettle depends on libGMP.
@@ -63,6 +65,9 @@ INSTALL(FILES ${CMAKE_BINARY_DIR}/install/${LIB_FOLDER}/libnettle.a ${CMAKE_BINA
         TYPE LIB)
 INSTALL(DIRECTORY ${CMAKE_BINARY_DIR}/install/include/
         DESTINATION include)
+
+INSTALL(FILES ${CMAKE_BINARY_DIR}/install/${LIB_FOLDER}/pkgconfig/hogweed.pc ${CMAKE_BINARY_DIR}/install/${LIB_FOLDER}/pkgconfig/nettle.pc
+        DESTINATION pkgconfig)
 
 CONFIGURE_FILE(installer/install.lua 
                ${CMAKE_CURRENT_BINARY_DIR}/package/install.lua
