@@ -6,8 +6,9 @@ if strDistId == '@JONCHKI_PLATFORM_DIST_ID@' and
 strDistVersion == '@JONCHKI_PLATFORM_DIST_VERSION@' and
 strCpuArch == '@JONCHKI_PLATFORM_CPU_ARCH@' then
   t:install_dev('include',    '${install_dev_include}/')
-  t:install_dev('cmake',      '${install_dev_cmake}/')
-  tResult = 
+  t:install_dev('lib',        '${install_dev_lib}/')
+  t:install_dev('pkgconfig',  '${install_dev}/pkgconfig/')
+  tResult = true
 end
 
-return tResult 
+return tResult
